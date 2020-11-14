@@ -16,7 +16,7 @@ class Remote:
     def __enter__(self):
         return self.remote.__enter__()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, kind, value, traceback):
         self.remote.__exit__(type, value, traceback)
 
     def close(self):

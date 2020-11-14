@@ -2,6 +2,9 @@
 samsungctl
 ==========
 
+sudo python setup.py install
+python -m samsungctl --host samsung --method websocket --port 8002 -i
+
 samsungctl is a library and a command line tool for remote controlling Samsung
 televisions via a TCP/IP connection. It currently supports both pre-2016 TVs as
 well most of the modern Tizen-OS TVs with Ethernet or Wi-Fi connectivity.

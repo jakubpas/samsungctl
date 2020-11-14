@@ -1,23 +1,21 @@
 import base64
 import json
 import logging
-import socket
+import websocket
 import time
 import os
 import ssl
 
 from . import exceptions
 
-
 URL_FORMAT = "ws://{}:{}/api/v2/channels/samsung.remote.control?name={}"
 SSL_URL_FORMAT = "wss://{}:{}/api/v2/channels/samsung.remote.control?name={}"
 
 
-class RemoteWebsocket():
+class RemoteWebsocket:
     """Object for remote control connection."""
 
     def __init__(self, config):
-        import websocket
         self.token_file = os.path.dirname(os.path.realpath(__file__)) + "/token.txt"
 
         if not config["port"]:
@@ -28,7 +26,7 @@ class RemoteWebsocket():
 
         if config["port"] == 8001:
             url = URL_FORMAT.format(config["host"], config["port"],
-                        self._serialize_string(config["name"]))
+                                    self._serialize_string(config["name"]))
 
             self.connection = websocket.create_connection(url, config["timeout"])
         elif config["port"] == 8002:
@@ -44,7 +42,7 @@ class RemoteWebsocket():
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, kind, value, traceback):
         self.close()
 
     def close(self):
