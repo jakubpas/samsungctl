@@ -29,28 +29,28 @@ def run(remote):
     curses.wrapper(_control, remote)
 
 
-def _control(stdscr, remote):
-    height, width = stdscr.getmaxyx()
+def _control(std_scr, remote):
+    height, width = std_scr.getmaxyx()
 
-    stdscr.addstr("Interactive mode, press 'Q' to exit.\n")
-    stdscr.addstr("Key mappings:\n")
+    std_scr.addstr("Interactive mode, press 'Q' to exit.\n")
+    std_scr.addstr("Key mappings:\n")
 
     column_len = max(len(mapping[2]) for mapping in _mappings) + 1
     mappings_dict = {}
     for mapping in _mappings:
         mappings_dict[mapping[0]] = mapping[1]
 
-        row = stdscr.getyx()[0] + 2
+        row = std_scr.getyx()[0] + 2
         if row < height:
             line = "  {}= {} ({})\n".format(mapping[2].ljust(column_len),
                                             mapping[3], mapping[1])
-            stdscr.addstr(line)
+            std_scr.addstr(line)
         elif row == height:
-            stdscr.addstr("[Terminal is too small to show all keys]\n")
+            std_scr.addstr("[Terminal is too small to show all keys]\n")
 
     running = True
     while running:
-        key = stdscr.getkey()
+        key = std_scr.getkey()
 
         if key == "q":
             running = False
@@ -59,8 +59,8 @@ def _control(stdscr, remote):
             remote.control(mappings_dict[key])
 
             try:
-                stdscr.addstr(".")
+                std_scr.addstr(".")
             except curses.error:
-                stdscr.deleteln()
-                stdscr.move(stdscr.getyx()[0], 0)
-                stdscr.addstr(".")
+                std_scr.deleteln()
+                std_scr.move(std_scr.getyx()[0], 0)
+                std_scr.addstr(".")

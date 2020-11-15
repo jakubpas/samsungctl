@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as Et
 import requests
 
 
@@ -8,7 +8,7 @@ class Upnp:
         self.mute = False
         self.volume = 0
 
-    def SOAPrequest(self, action, arguments, protocole):
+    def soap_request(self, action, arguments, protocole):
         headers = {'SOAPAction': '"urn:schemas-upnp-org:service:{protocole}:1#{action}"'.format(action=action,
                                                                                                 protocole=protocole),
                    'content-type': 'text/xml'}
@@ -33,27 +33,28 @@ class Upnp:
 
     def get_volume(self):
         self.volume = 0
-        response = self.SOAPrequest('GetVolume', "<Channel>Master</Channel>", 'RenderingControl')
-        if (response is not None):
+        response = self.soap_request('GetVolume', "<Channel>Master</Channel>", 'RenderingControl')
+        if response is not None:
             volume_xml = response.decode('utf8')
-            tree = ET.fromstring(volume_xml)
+            tree = Et.fromstring(volume_xml)
             for elem in tree.iter(tag='CurrentVolume'):
                 self.volume = elem.text
         return self.volume
 
     def set_volume(self, volume):
-        self.SOAPrequest('SetVolume', "<Channel>Master</Channel><DesiredVolume>{}</DesiredVolume>".format(volume),
-                         'RenderingControl')
+        self.soap_request('SetVolume', "<Channel>Master</Channel><DesiredVolume>{}</DesiredVolume>".format(volume),
+                          'RenderingControl')
 
     def get_mute(self):
+        mute = 0
         self.mute = False
-        response = self.SOAPrequest('GetMute', "<Channel>Master</Channel>", 'RenderingControl')
-        if (response is not None):
+        response = self.soap_request('GetMute', "<Channel>Master</Channel>", 'RenderingControl')
+        if response is not None:
             mute_xml = response.decode('utf8')
-            tree = ET.fromstring(mute_xml)
+            tree = Et.fromstring(mute_xml)
             for elem in tree.iter(tag='CurrentMute'):
                 mute = elem.text
-            if (int(mute) == 0):
+            if int(mute) == 0:
                 self.mute = False
             else:
                 self.mute = True
@@ -61,10 +62,10 @@ class Upnp:
 
     def set_current_media(self, url):
         """ Set media to playback."""
-        self.SOAPrequest('SetAVTransportURI',
-                         "<CurrentURI>{url}</CurrentURI><CurrentURIMetaData></CurrentURIMetaData>".format(url=url),
-                         'AVTransport')
+        self.soap_request('SetAVTransportURI',
+                          "<CurrentURI>{url}</CurrentURI><CurrentURIMetaData></CurrentURIMetaData>".format(url=url),
+                          'AVTransport')
 
     def play(self):
         """ Play media that was already set as current."""
-        self.SOAPrequest('Play', "<Speed>1</Speed>", 'AVTransport')
+        self.soap_request('Play', "<Speed>1</Speed>", 'AVTransport')

@@ -2,6 +2,8 @@
 samsungctl
 ==========
 
+
+pip install 'websocket-client==0.57.0'
 sudo python setup.py install
 python -m samsungctl --host samsung --method websocket --port 8002 -i
 

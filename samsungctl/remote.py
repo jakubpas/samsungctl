@@ -1,7 +1,6 @@
 from . import exceptions
 from .remote_legacy import RemoteLegacy
 from .remote_websocket import RemoteWebsocket
-from .application import Application
 
 
 class Remote:
