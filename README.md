@@ -1,43 +1,52 @@
-==========
 samsungctl
 ==========
 
+samsungctl is a library and a command line tool for remote controlling Samsung QLED
+televisions via a websocket. Its a fork of https://github.com/Ape/samsungctl but support for moder QLED TV's was addad
+also in interactive mode menu was redesigned to match QLED remote control.
+At this moment installation breaks with newest vestion on websocket-client co be sure tu install version <=0.57.0
 
-pip install 'websocket-client==0.57.0'
-sudo python setup.py install
-python -m samsungctl --host samsung --method websocket --port 8002 -i
+The app should also runs with older samung TV when run in legacy mode.
 
-samsungctl is a library and a command line tool for remote controlling Samsung
-televisions via a TCP/IP connection. It currently supports both pre-2016 TVs as
-well most of the modern Tizen-OS TVs with Ethernet or Wi-Fi connectivity.
+Before running app go to TV Manu and choose:
+
+General -> External Device Manager -> Device Connection Manager -> Access Notification = Allways on
+
+After that run application and accept incoming connection to tv.
+
+then switch
+
+General -> External Device Manager -> Device Connection Manager -> Access Notification = off
+
+Otherwise you will have problem with connection to tv or you will be asked to authenticate everytime the app is run
+
+This is work in progress. The sometimes have problem with websocket connection and drops with broken pipe error but
+it should work most of the time.
+
 
 Dependencies
 ============
 
 - Python 3
-- ``websocket-client`` (optional, for 2016+ TVs)
-- ``curses`` (optional, for the interactive mode)
+- ``websocket-client==0.56.0``
+- ``curses`` - for the interactive mode
 
-Installation
-============
-
-samsungctl can be installed using `pip <(https://pip.pypa.io/>`_:
+Installation and running
+========================
 
 ::
 
-    # pip install samsungctl
-
-Alternatively you can clone the Git repository and run:
+    pip install 'websocket-client==0.56.0'
 
 ::
 
-    # python setup.py install
-
-It's possible to use the command line tool without installation:
+    sudo python setup.py install
 
 ::
 
-    $ python -m samsungctl
+    python -m samsungctl --host samsung --method websocket --port 8002 -i
+
+Other than that you can follow manual of original samsungctl:
 
 Command line usage
 ==================

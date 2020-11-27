@@ -12,7 +12,6 @@ _mappings = [
     ["KEY_BACKSPACE", "KEY_RETURN",        "Backspace", "Return"],
     ["e",             "KEY_EXIT",          "E",         "Exit"],
     [" ",             "KEY_PLAY",          "Space",         "Play/Pause"],
-    ["l",             "KEY_CH_LIST",       "L",         "Channel List"],
     ["m",             "KEY_MENU",          "M",         "Menu"],
     ["s",             "KEY_SOURCE",        "S",         "Source"],
     ["+",             "KEY_VOLUP",         "+",         "Volume Up"],
