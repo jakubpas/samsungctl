@@ -51,7 +51,10 @@ def _control(std_scr, remote):
 
     running = True
     while running:
-        key = std_scr.getkey()
+        try:
+            key = std_scr.getkey()
+        except KeyboardInterrupt:
+            break
 
         if key == "q":
             running = False
