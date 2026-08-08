@@ -74,18 +74,28 @@ class RemoteWebsocket:
     _key_interval = 0.2
 
     def _read_response(self):
-        response = self.connection.recv()
-        response = json.loads(response)
+        # Newer TVs may send other informational events (e.g.
+        # "ms.remote.touchDisable") before or after the connect
+        # confirmation, so keep reading until we see it (or an explicit
+        # unauthorized event).
+        while True:
+            response = self.connection.recv()
+            response = json.loads(response)
 
-        if 'data' in response and 'token' in response["data"]:
-            with open(self.token_file, "w") as token_file:
-                token_file.write(response['data']["token"])
+            if 'data' in response and 'token' in response["data"]:
+                with open(self.token_file, "w") as token_file:
+                    token_file.write(response['data']["token"])
 
-        if response["event"] != "ms.channel.connect":
-            self.close()
-            raise exceptions.UnhandledResponse(response)
+            if response["event"] == "ms.channel.connect":
+                logging.debug("Access granted.")
+                return
 
-        logging.debug("Access granted.")
+            if response["event"] == "ms.channel.unauthorized":
+                self.close()
+                raise exceptions.UnhandledResponse(response)
+
+            logging.debug("Ignoring event while waiting for connect: %s",
+                          response)
 
     @staticmethod
     def _serialize_string(string):
