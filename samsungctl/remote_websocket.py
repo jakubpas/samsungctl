@@ -17,6 +17,7 @@ class RemoteWebsocket:
 
     def __init__(self, config):
         self.token_file = os.path.dirname(os.path.realpath(__file__)) + "/token.txt"
+        self._config = config
 
         if not config["port"]:
             config["port"] = 8001
@@ -24,10 +25,13 @@ class RemoteWebsocket:
         if config["timeout"] == 0:
             config["timeout"] = None
 
+        self._connect()
+
+    def _connect(self):
+        config = self._config
         if config["port"] == 8001:
             url = URL_FORMAT.format(config["host"], config["port"],
                                     self._serialize_string(config["name"]))
-
             self.connection = websocket.create_connection(url, config["timeout"])
         elif config["port"] == 8002:
             url = SSL_URL_FORMAT.format(config["host"], config["port"],
@@ -58,24 +62,85 @@ class RemoteWebsocket:
             self.connection = None
             logging.debug("Connection closed.")
 
-    def control(self, key):
-        """Send a control command."""
-        if not self.connection:
-            raise exceptions.ConnectionClosed()
+    def _ensure_connected(self):
+        """Reconnect if the connection has been dropped."""
+        try:
+            self.connection.ping()
+        except Exception:
+            logging.debug("Connection lost, reconnecting.")
+            self._connect()
 
+    def _send(self, method, params, delay=0):
+        if not self.connection:
+            self._connect()
+
+        self._ensure_connected()
         payload = json.dumps({
-            "method": "ms.remote.control",
-            "params": {
-                "Cmd": "Click",
-                "DataOfCmd": key,
-                "Option": "false",
-                "TypeOfRemote": "SendRemoteKey"
-            }
+            "method": method,
+            "params": params
+        })
+        self.connection.send(payload)
+        if delay:
+            time.sleep(delay)
+
+    def control(self, key):
+        """Send a remote key."""
+        logging.info("Sending control command: %s", key)
+        self._send("ms.remote.control", {
+            "Cmd": "Click",
+            "DataOfCmd": key,
+            "Option": "false",
+            "TypeOfRemote": "SendRemoteKey"
+        }, self._key_interval)
+
+    def move_cursor(self, x, y, duration=0):
+        """Move the TV cursor by relative x and y offsets."""
+        self._send("ms.remote.control", {
+            "Cmd": "Move",
+            "Position": {
+                "x": x,
+                "y": y,
+                "Time": str(duration)
+            },
+            "TypeOfRemote": "ProcessMouseDevice"
         })
 
-        logging.info("Sending control command: %s", key)
-        self.connection.send(payload)
-        time.sleep(self._key_interval)
+    def click_cursor(self, button="left"):
+        """Click a TV cursor button."""
+        buttons = {
+            "left": "LeftClick",
+            "right": "RightClick"
+        }
+        try:
+            command = buttons[button.lower()]
+        except (AttributeError, KeyError):
+            raise ValueError("button must be 'left' or 'right'")
+
+        self._send("ms.remote.control", {
+            "Cmd": command,
+            "TypeOfRemote": "ProcessMouseDevice"
+        })
+
+    def send_text(self, text):
+        """Send UTF-8 text to the active TV input field."""
+        if not text:
+            return
+
+        self._send("ms.channel.emit", {
+            "event": "custom.remote.textReceived",
+            "to": "broadcast"
+        }, self._key_interval)
+        self._send("ms.remote.control", {
+            "Cmd": self._serialize_string(text),
+            "DataOfCmd": "base64",
+            "TypeOfRemote": "SendInputString"
+        }, self._key_interval)
+
+    def end_text(self):
+        """Finish the current TV text input session."""
+        self._send("ms.remote.control", {
+            "TypeOfRemote": "SendInputEnd"
+        })
 
     _key_interval = 0.2
 

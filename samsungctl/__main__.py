@@ -73,6 +73,12 @@ def main():
                         help="suppress non-fatal output")
     parser.add_argument("-i", "--interactive", action="store_true",
                         help="interactive control")
+    parser.add_argument("--text", metavar="TEXT",
+                        help="send text to the active TV input field")
+    parser.add_argument("--move", nargs=2, type=int, metavar=("X", "Y"),
+                        help="move the TV cursor by relative X/Y offsets")
+    parser.add_argument("--click", choices=("left", "right"),
+                        help="click a TV cursor button")
     parser.add_argument("--host", help="TV hostname or IP address")
     parser.add_argument("--port", type=int, help="TV port number (TCP)")
     parser.add_argument("--method",
@@ -106,16 +112,33 @@ def main():
         logging.error("Error: --host must be set")
         return
 
+    pointer_or_text = (
+        args.text is not None or args.move is not None or
+        args.click is not None
+    )
+    if pointer_or_text and config["method"] != "websocket":
+        parser.error("--text, --move and --click require --method websocket")
+
     try:
         with Remote(config) as remote:
             for key in args.key:
                 remote.control(key)
 
+            if args.move:
+                remote.move_cursor(*args.move)
+
+            if args.click:
+                remote.click_cursor(args.click)
+
+            if args.text is not None:
+                remote.send_text(args.text)
+                remote.end_text()
+
             if args.interactive:
                 logging.getLogger().setLevel(logging.ERROR)
                 from . import interactive
                 interactive.run(remote)
-            elif len(args.key) == 0:
+            elif len(args.key) == 0 and not pointer_or_text:
                 logging.warning("Warning: No keys specified.")
     except exceptions.ConnectionClosed:
         logging.error("Error: Connection closed!")
