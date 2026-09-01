@@ -24,5 +24,17 @@ class Remote:
     def control(self, key):
         return self.remote.control(key)
 
+    def move_cursor(self, x, y, duration=0):
+        return self.remote.move_cursor(x, y, duration)
+
+    def click_cursor(self, button="left"):
+        return self.remote.click_cursor(button)
+
+    def send_text(self, text):
+        return self.remote.send_text(text)
+
+    def end_text(self):
+        return self.remote.end_text()
+
     def get_installed_apps(self):
         return self.remote.get_installed_apps()

@@ -66,6 +66,24 @@ There is also an interactive mode (ncurses) for sending the key presses:
 
     $ samsungctl --host <host> [options] --interactive
 
+Interactive mode also supports pointer and text input on websocket TVs:
+
+- Press ``c`` to toggle cursor mode. Arrow keys move the pointer,
+  Enter/Space left-clicks, ``r`` right-clicks, and ``+``/``-`` adjust speed.
+- Press ``t`` to enter or paste text, then Enter to send it to the active TV
+  input field. Escape cancels.
+
+Pointer and text commands can also be sent directly:
+
+::
+
+    $ samsungctl --host <host> --method websocket --move 100 -50
+    $ samsungctl --host <host> --method websocket --click left
+    $ samsungctl --host <host> --method websocket --text "search phrase"
+
+Support depends on the active TV app; some apps ignore injected pointer or
+text input.
+
 Use ``samsungctl --help`` for more information about the command line
 arguments:
 
