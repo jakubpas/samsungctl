@@ -39,12 +39,12 @@ class RemoteWebsocket:
             if os.path.isfile(self.token_file):
                 with open(self.token_file, "r") as token_file:
                     url += "&token=" + token_file.readline()
-            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
             self.connection = websocket.create_connection(
                 url, config["timeout"],
-                sslopt={"context": ssl_context}
+                sslopt={
+                    "cert_reqs": ssl.CERT_NONE,
+                    "check_hostname": False
+                }
             )
 
         self._read_response()
