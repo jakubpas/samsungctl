@@ -2,24 +2,24 @@
 
 import setuptools
 
-import samsungctl
-
 setuptools.setup(
-    name=samsungctl.__title__,
-    version=samsungctl.__version__,
-    description=samsungctl.__doc__,
-    url=samsungctl.__url__,
-    author=samsungctl.__author__,
-    author_email=samsungctl.__author_email__,
-    license=samsungctl.__license__,
+    name="samsungctl",
+    version="0.8",
+    description="Remote control Samsung televisions via TCP/IP connection",
+    url="https://github.com/jakubpas/samsungctl",
+    author="Jakub Pas",
+    author_email="",
+    license="MIT",
     long_description=open("README.md").read(),
     entry_points={
         "console_scripts": ["samsungctl=samsungctl.__main__:main"]
     },
     packages=["samsungctl"],
-    install_requires=[],
+    install_requires=[
+        "requests",
+        "websocket-client>=1.9.0",
+    ],
     extras_require={
-        "websocket": ["websocket-client"],
         "interactive_ui": ["curses"],
     },
     classifiers=[

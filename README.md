@@ -4,7 +4,7 @@ samsungctl
 samsungctl is a library and a command line tool for remote controlling Samsung QLED
 televisions via a websocket. Its a fork of https://github.com/Ape/samsungctl but support for moder QLED TV's was addad
 also in interactive mode menu was redesigned to match QLED remote control.
-At this moment installation breaks with newest vestion on websocket-client co be sure tu install version <=0.57.0
+The secure websocket connection requires websocket-client 1.9.0 or newer.
 
 The app should also runs with older samung TV when run in legacy mode.
 
@@ -28,7 +28,8 @@ Dependencies
 ============
 
 - Python 3
-- ``websocket-client==0.56.0``
+- ``websocket-client>=1.9.0``
+- ``requests``
 - ``curses`` - for the interactive mode
 
 Installation and running
@@ -36,11 +37,7 @@ Installation and running
 
 ::
 
-    pip install 'websocket-client==0.56.0'
-
-::
-
-    sudo python setup.py install
+    pip install .
 
 ::
 
